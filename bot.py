@@ -16,9 +16,20 @@ def main():
         raise RuntimeError("환경변수 TELEGRAM_TOKEN 이 설정되지 않았음")
 
     app = Application.builder().token(TOKEN).build()
+
     app.add_handler(CommandHandler("start", start))
     app.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, on_text))
-    app.run_polling()
+
+    # ✅ Railway 같은 환경에서 '안 죽게' 만드는 폴링 옵션
+    app.run_polling(
+        drop_pending_updates=True,
+        poll_interval=2.0,
+        timeout=30,
+        read_timeout=30,
+        write_timeout=30,
+        connect_timeout=30,
+        allowed_updates=Update.ALL_TYPES,
+    )
 
 if __name__ == "__main__":
     main()
